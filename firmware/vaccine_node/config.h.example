@@ -1,0 +1,28 @@
+#pragma once
+
+// Copy this file to secrets.h and fill in real values. Never commit secrets.h.
+
+#define WIFI_SSID "your-wifi-ssid"
+#define WIFI_PASSWORD "your-wifi-password"
+
+#define MQTT_HOST "192.168.1.10"
+#define MQTT_PORT 1883
+#define MQTT_USERNAME ""
+#define MQTT_PASSWORD ""
+#define MQTT_USE_TLS 0
+// For TLS, paste the broker/CA certificate here and set MQTT_USE_TLS to 1.
+#define MQTT_ROOT_CA ""
+
+#define DEVICE_ID "VX-001"
+#define FIRMWARE_VERSION "1.0.0"
+
+// 64 lowercase hex characters. Derive it with:
+//   python scripts/provision_device.py VX-001
+#define DEVICE_SECRET_HEX "0000000000000000000000000000000000000000000000000000000000000000"
+
+#define READING_INTERVAL_S 30
+#define GPS_WARMUP_MS 2500
+#define DHT_PIN 4
+#define GPS_RX_PIN 16
+#define GPS_TX_PIN 17
+#define STATUS_LED_PIN 2
