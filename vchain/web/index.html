@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>VChain · Cold-Chain Ledger</title>
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="34" height="34">
+          <path d="M20 4 34 12v16L20 36 6 28V12Z" fill="none" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M13 20l5 5 10-11" fill="none" stroke="#34d399" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>VChain</h1>
+        <p>Cold-chain ledger <span class="sep">/</span> vaccine transport</p>
+      </div>
+    </div>
+
+    <div class="netbar" role="status" aria-live="polite">
+      <span class="pill" id="net-mqtt"><i class="dot"></i><span>MQTT</span></span>
+      <span class="pill" id="net-chain"><i class="dot"></i><span>Chain</span></span>
+      <span class="pill" id="net-nodes"><i class="dot"></i><span>Nodes</span></span>
+      <span class="pill muted" id="uptime"><span>—</span></span>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" id="btn-pause" title="Pause live updates">Pause</button>
+      <button class="btn ghost" id="btn-export" title="Download the signed audit bundle">Export</button>
+      <button class="btn" id="btn-audit">
+        <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M10 2l6 3v5c0 4-2.6 6.7-6 8-3.4-1.3-6-4-6-8V5Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Run audit
+      </button>
+      <button class="btn danger" id="btn-reset" title="Rebuild the demo ledger from genesis">Reset demo</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div>
+        <h2>Immutable proof for every degree.</h2>
+        <p>Edge-signed telemetry, Merkle-rooted batches and a validator quorum make retroactive temperature edits impossible to hide.</p>
+      </div>
+      <div class="intro-meta">
+        <span class="label">Latest seal</span>
+        <strong id="latest-seal">—</strong>
+        <span class="muted" id="latest-seal-sub">waiting for first block</span>
+      </div>
+    </section>
+
+    <div id="integrity-banner" class="banner" hidden>
+      <div>
+        <strong>Ledger integrity failure.</strong>
+        <span id="banner-text">Stored data no longer matches the anchored commitments.</span>
+      </div>
+      <button class="btn small" id="banner-audit">Inspect audit</button>
+    </div>
+
+    <section class="kpis" aria-label="Key metrics">
+      <article class="kpi">
+        <span class="kpi-label">Anchor latency <em>p95</em></span>
+        <strong class="kpi-value" id="kpi-latency">—</strong>
+        <span class="kpi-sub" id="kpi-latency-sub">awaiting MQTT samples</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-label">Readings anchored</span>
+        <strong class="kpi-value" id="kpi-readings">—</strong>
+        <span class="kpi-sub" id="kpi-readings-sub">—</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-label">Chain height</span>
+        <strong class="kpi-value" id="kpi-blocks">—</strong>
+        <span class="kpi-sub" id="kpi-blocks-sub">—</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-label">Tamper detection</span>
+        <strong class="kpi-value" id="kpi-tamper">—</strong>
+        <span class="kpi-sub" id="kpi-tamper-sub">no attacks yet</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-label">Cold-chain alerts</span>
+        <strong class="kpi-value" id="kpi-alerts">—</strong>
+        <span class="kpi-sub" id="kpi-alerts-sub">—</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-label">Field battery life</span>
+        <strong class="kpi-value" id="kpi-battery">—</strong>
+        <span class="kpi-sub" id="kpi-battery-sub">—</span>
+      </article>
+    </section>
+
+    <div class="layout">
+      <section class="card chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Live cold chain</h3>
+            <p>Temperature telemetry anchored to the ledger · safe band 2–8 °C</p>
+          </div>
+          <div class="chart-legend" id="chart-legend"></div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="temp-chart" aria-label="Temperature chart"></canvas>
+          <div class="chart-empty" id="chart-empty">Waiting for anchored telemetry…</div>
+        </div>
+      </section>
+
+      <section class="card fleet-card">
+        <div class="card-head">
+          <div>
+            <h3>Fleet</h3>
+            <p>Edge nodes, MKT and battery state</p>
+          </div>
+          <span class="tag" id="fleet-count">—</span>
+        </div>
+        <div class="fleet" id="fleet"></div>
+      </section>
+
+      <section class="card audit-card">
+        <div class="card-head">
+          <div>
+            <h3>Integrity audit</h3>
+            <p>Re-derived digests, signatures, proofs and proof-of-work</p>
+          </div>
+          <button class="btn small" id="btn-audit-2">Run audit</button>
+        </div>
+        <div class="audit-summary" id="audit-summary">
+          <span class="badge neutral">Not run yet</span>
+          <span class="muted">Run an audit to verify every stored byte.</span>
+        </div>
+        <div class="audit-meta" id="audit-meta"></div>
+        <div class="failures" id="audit-failures"></div>
+
+        <div class="tamper-head">
+          <h4>Tamper lab</h4>
+          <p>Attack the database or the wire and watch the audit respond.</p>
+        </div>
+        <div class="tamper-grid" id="tamper-grid"></div>
+        <div class="tamper-history" id="tamper-history"></div>
+      </section>
+
+      <section class="card alerts-card">
+        <div class="card-head">
+          <div>
+            <h3>Alert stream</h3>
+            <p>Excursions, policy breaches and rejected packets</p>
+          </div>
+          <span class="tag" id="alert-count">—</span>
+        </div>
+        <div class="alerts" id="alerts"></div>
+      </section>
+
+      <section class="card chain-card">
+        <div class="card-head">
+          <div>
+            <h3>Ledger explorer</h3>
+            <p>Each block commits a Merkle root of signed reading digests</p>
+          </div>
+          <span class="tag" id="chain-tag">—</span>
+        </div>
+        <div class="table-wrap">
+          <table class="table blocks-table">
+            <thead>
+              <tr><th>#</th><th>Block hash</th><th>Merkle root</th><th>Readings</th><th>Alerts</th><th>Validators</th><th>Sealed</th></tr>
+            </thead>
+            <tbody id="blocks"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card readings-card">
+        <div class="card-head">
+          <div>
+            <h3>Recent readings</h3>
+            <p>Click a row to inspect the signature and Merkle inclusion proof</p>
+          </div>
+          <span class="tag" id="reading-count">—</span>
+        </div>
+        <div class="table-wrap">
+          <table class="table readings-table">
+            <thead>
+              <tr><th>Time</th><th>Device</th><th>Temp</th><th>RH</th><th>Seq</th><th>Block</th><th>Latency</th><th>Digest</th><th>Status</th></tr>
+            </thead>
+            <tbody id="readings"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <span>SHA-256 payload digests</span>
+      <span>HMAC-SHA256 device signatures</span>
+      <span>Merkle-rooted batches</span>
+      <span>3-validator quorum</span>
+      <span>proof-of-work seal</span>
+      <span class="muted" id="last-update">—</span>
+    </footer>
+  </main>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <h3 id="modal-title">Detail</h3>
+        <button class="icon-btn" id="modal-close" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

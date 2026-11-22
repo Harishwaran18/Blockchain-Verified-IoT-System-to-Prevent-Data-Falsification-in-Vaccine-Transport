@@ -1,0 +1,114 @@
+{
+  "generated_at": "2026-11-22T09:35:38+00:00",
+  "environment": {
+    "python": "3.13.15",
+    "platform": "Linux-6.8.0-1055-gke-x86_64-with-glibc2.41",
+    "processor": "unknown",
+    "difficulty": 4,
+    "block_size": 8,
+    "block_interval_s": 1.0,
+    "validators": 3,
+    "quorum": 2
+  },
+  "workload": {
+    "readings": 240,
+    "devices": 4,
+    "publish_rate_per_s": 80.0,
+    "publish_seconds": 3.005,
+    "total_seconds": 3.193,
+    "throughput_per_s": 75.2,
+    "blocks": 30,
+    "anchored": 240,
+    "pending": 0,
+    "rejected": 0,
+    "avg_mine_ms": 90.9,
+    "max_mine_ms": 428.8,
+    "first_block_hash": "0000ac3a415e5c2c8f84581bf6f9a118e6f61f76de64258083e719e74274794c"
+  },
+  "latency_ms": {
+    "avg_ms": 7.53,
+    "p50_ms": 2.0,
+    "p95_ms": 38.4,
+    "max_ms": 88.0,
+    "n": 240
+  },
+  "tamper": {
+    "attacks": [
+      {
+        "attack": "replay",
+        "detected": true,
+        "findings": [
+          "REPLAY_REJECTED"
+        ]
+      },
+      {
+        "attack": "edit_temperature",
+        "detected": true,
+        "findings": [
+          "READING_DIGEST_MISMATCH"
+        ]
+      },
+      {
+        "attack": "resign_edit",
+        "detected": true,
+        "findings": [
+          "ANCHORED_READING_MISSING",
+          "READING_NOT_IN_BLOCK"
+        ]
+      },
+      {
+        "attack": "forge_reading",
+        "detected": true,
+        "findings": [
+          "READING_NOT_IN_BLOCK",
+          "READING_SIGNATURE_INVALID"
+        ]
+      },
+      {
+        "attack": "delete_reading",
+        "detected": true,
+        "findings": [
+          "ANCHORED_READING_MISSING"
+        ]
+      },
+      {
+        "attack": "rewrite_block",
+        "detected": true,
+        "findings": [
+          "BLOCK_LINK_BROKEN",
+          "BLOCK_POW_INVALID",
+          "BLOCK_QUORUM_FAILURE",
+          "READING_NOT_IN_BLOCK"
+        ]
+      }
+    ],
+    "detected": 6,
+    "total": 6,
+    "detection_rate": 1.0
+  },
+  "battery": {
+    "capacity_mah": 2500.0,
+    "active_current_ma": 120.0,
+    "sleep_current_ma": 0.05,
+    "active_seconds": 4.0,
+    "interval_seconds": 30.0,
+    "average_current_ma": 16.043,
+    "runtime_hours": 132.5,
+    "runtime_days": 5.5,
+    "energy_per_reading_j": 1.781
+  },
+  "audit_after_attacks": {
+    "ok": false,
+    "checks": 1616,
+    "failures": 10,
+    "duration_ms": 9.87
+  },
+  "claims": {
+    "latency_p95_under_1800_ms": true,
+    "tamper_detection_100_percent": true,
+    "battery_over_72_hours": true,
+    "all_readings_anchored": true,
+    "chain_structurally_valid": true
+  },
+  "all_claims_pass": true
+}
